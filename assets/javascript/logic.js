@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-    // Initialize Firebase
     var config = {
       apiKey: "AIzaSyA4Y6Ywc3MMHCQ7tZHkMyH1l9vx_qSRA6M",
       authDomain: "train-schedule-5f60e.firebaseapp.com",
@@ -12,17 +11,14 @@ $(document).ready(function () {
   
     var database = firebase.database();
   
-    // Capture Button Click
     $("#addTrain").on("click", function (event) {
       event.preventDefault();
   
-      // Grabbed values from text boxes
       var trainName = $("#trainName").val().trim();
       var destination = $("#destination").val().trim();
       var firstTrain = $("#firstTrain").val().trim();
       var freq = $("#interval").val().trim();
   
-      // Code for handling the push
       database.ref().push({
         trainName: trainName,
         destination: destination,
@@ -31,8 +27,6 @@ $(document).ready(function () {
       });
     });
   
-  
-    // Firebase watcher + initial loader HINT: This code behaves similarly to .on("value")
     database.ref().on("child_added", function (childSnapshot) {
   
       var newTrain = childSnapshot.val().trainName;
@@ -40,26 +34,13 @@ $(document).ready(function () {
       var newFirstTrain = childSnapshot.val().firstTrain;
       var newFreq = childSnapshot.val().frequency;
   
-      // First Time (pushed back 1 year to make sure it comes before current time)
       var startTimeConverted = moment(newFirstTrain, "hh:mm").subtract(1, "years");
-  
-      // Current Time
-      var currentTime = moment();
-  
-      // Difference between the times
       var diffTime = moment().diff(moment(startTimeConverted), "minutes");
-  
-      // Time apart (remainder)
       var tRemainder = diffTime % newFreq;
-  
-      // Minute(s) Until Train
       var tMinutesTillTrain = newFreq - tRemainder;
-  
-      // Next Train
       var nextTrain = moment().add(tMinutesTillTrain, "minutes");
       var catchTrain = moment(nextTrain).format("HH:mm");
   
-      // Display On Page
       $("#all-display").append(
         ' <tr><td>' + newTrain +
         ' </td><td>' + newLocation +
@@ -67,7 +48,6 @@ $(document).ready(function () {
         ' </td><td>' + catchTrain +
         ' </td><td>' + tMinutesTillTrain + ' </td></tr>');
   
-      // Clear input fields
       $("#trainName, #destination, #firstTrain, #interval").val("");
       return false;
     },
